@@ -47,6 +47,7 @@ cout << "Added on Linux" << endl;
 #if defined(_WIN32) || (_WIN64)
 
 cout << "Running on Windows" << endl;
+cout << "Added on Windows" << endl;
 
 #endif
 
