@@ -87,7 +87,7 @@ cout << "Added on Windows" << endl;
 	GameState gameState = MENU;
 
 	//boolean values to control movement through the states****
-	bool menu, instructions, players1, players2, win, lose, quit;
+	bool menu, instructions, players1, players2, win, lose, quit = false;
 
 
 
