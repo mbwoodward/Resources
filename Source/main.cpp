@@ -27,6 +27,58 @@ int lastTime = 0;
 
 
 
+//set speed for background
+int bkgdSpeed = 100;
+
+
+//set temp variables to hold movement - background 1
+float BG1pos_X=0, BG1pos_Y=0;
+
+
+//set temp variables to hold movement - background 2
+float BG2pos_X=0, BG2pos_Y= -768;
+
+SDL_Rect bkgd1Pos;
+SDL_Rect bkgd2Pos;
+
+//move the background
+void UpdateBackground()
+{
+	//Update Background 1
+	BG1pos_Y += (bkgdSpeed * 1)* deltaTime;
+
+	//set the new bkgd1 position
+	bkgd1Pos.y = (int)(BG1pos_Y + .5f);
+
+	//reset when off the bottom of the screen
+	if(bkgd1Pos.y >= 768)
+	{
+		bkgd1Pos.y = -768;
+		BG1pos_Y = bkgd1Pos.y;
+
+
+	}
+
+	//Update Background 2
+	BG2pos_Y += (bkgdSpeed * 1)* deltaTime;
+
+	//set the new bkgd2 position
+	bkgd2Pos.y = (int)(BG2pos_Y + .5f);
+
+	//reset when off the bottom of the screen
+	if(bkgd2Pos.y >= 768)
+	{
+		bkgd2Pos.y = -768;
+		BG2pos_Y = bkgd2Pos.y;
+
+
+	}
+
+
+}
+
+
+
 
 int main(int argc, char* argv[]) {
 
@@ -84,7 +136,7 @@ cout << "Added on Windows" << endl;
 
 
     //****** Create Background ******
-    string BKGDpath = s_cwd_images + "/Prototype.png";
+    string BKGDpath = s_cwd_images + "/Bacground.png";
 
     //cout <<BKGDpath << endl;
 
@@ -107,8 +159,6 @@ cout << "Added on Windows" << endl;
     //free the SDL surface
     SDL_FreeSurface(surface);
 
-    // create the SDL_Rectangle for the texture's position and size - x,y,w,h
-    SDL_Rect bkgd1Pos;
 
     // set the X,Y,W, and H for the Rectangle
     bkgd1Pos.x=0;
@@ -116,8 +166,6 @@ cout << "Added on Windows" << endl;
     bkgd1Pos.w=1024;
     bkgd1Pos.h=768;
 
-    // create the SDL_Rectangle for the texture's position and size - x,y,w,h
-    SDL_Rect bkgd2Pos;
 
     // set the X,Y,W, and H for the Rectangle
     bkgd2Pos.x=0;
@@ -125,20 +173,11 @@ cout << "Added on Windows" << endl;
     bkgd2Pos.w=1024;
     bkgd2Pos.h=768;
 
-    //set speed for background
-    int bkgdSpeed = 100;
 
-
-    //set temp variables to hold movement - background 1
-    float BG1pos_X=0, BG1pos_Y=0;
-
-
-    //set temp variables to hold movement - background 2
-    float BG2pos_X=0, BG2pos_Y= -768;
 
     //***** Create CURSOR*****
     //create cursor
-    string CURSORpath = s_cwd_images + "/cursor.png";
+    string CURSORpath = s_cwd_images + "/CursorNew.png";
 
     // create a SDL surface to hold the background image
     surface = IMG_Load(CURSORpath.c_str());
@@ -253,36 +292,8 @@ cout << "Added on Windows" << endl;
 
 
 					//Update
+					UpdateBackground();
 
-					//Update Background 1
-					BG1pos_Y += (bkgdSpeed * 1)* deltaTime;
-
-					//set the new bkgd1 position
-					bkgd1Pos.y = (int)(BG1pos_Y + .5f);
-
-					//reset when off the bottom of the screen
-					if(bkgd1Pos.y >= 768)
-					{
-						bkgd1Pos.y = -768;
-						BG1pos_Y = bkgd1Pos.y;
-
-
-					}
-
-					//Update Background 2
-					BG2pos_Y += (bkgdSpeed * 1)* deltaTime;
-
-					//set the new bkgd2 position
-					bkgd2Pos.y = (int)(BG2pos_Y + .5f);
-
-					//reset when off the bottom of the screen
-					if(bkgd2Pos.y >= 768)
-					{
-						bkgd2Pos.y = -768;
-						BG2pos_Y = bkgd2Pos.y;
-
-
-					}
 
 
 					// Start Drawing
