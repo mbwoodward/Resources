@@ -16,6 +16,17 @@
 #include "SDL_image.h"
 #endif
 
+
+#if defined(_WIN32) || (_WIN64)
+#include <direct.h>
+#define getcwd _getcwd
+#endif
+
+#if defined(__linux__)
+#include <unistd.h>
+#endif
+
+#include "player.h"
 #include <stdio.h>
 #include <iostream>
 using namespace std;
@@ -25,16 +36,10 @@ float deltaTime = 0.0;
 int thisTime = 0;
 int lastTime = 0;
 
-
-
 //set speed for background
 int bkgdSpeed = 100;
-
-
 //set temp variables to hold movement - background 1
 float BG1pos_X=0, BG1pos_Y=0;
-
-
 //set temp variables to hold movement - background 2
 float BG2pos_X=0, BG2pos_Y= -768;
 
@@ -55,8 +60,6 @@ void UpdateBackground()
 	{
 		bkgd1Pos.y = -768;
 		BG1pos_Y = bkgd1Pos.y;
-
-
 	}
 
 	//Update Background 2
@@ -70,14 +73,106 @@ void UpdateBackground()
 	{
 		bkgd2Pos.y = -768;
 		BG2pos_Y = bkgd2Pos.y;
+	}
+}
 
+//new joystick vars
+//Analog joystick dead zone
+const int JOYSTICK_DEAD_ZONE =8000;
 
+// joystick direction vars
+float xDir, yDir;
+
+// cursor float vars for movement
+float pos_X, pos_Y;
+
+//create SDL Rectangle for the 2 player graphic
+SDL_Rect cursorPos, activePos;
+
+//var from cursor speed
+int cursorSpeed = 400;
+
+void moveCursor(const SDL_ControllerAxisEvent event)
+{
+	// check joystick 0 - first player
+	if(event.which == 0)
+	{
+		// check X axis
+		if(event.axis == 0)
+		{
+			if(event.value < -JOYSTICK_DEAD_ZONE)
+			{
+				xDir = -1.0f;
+			}else if(event.value > JOYSTICK_DEAD_ZONE)
+			{
+				xDir = 1.0f;
+			}else
+			{
+				xDir = 0.0f;
+			}
+		}
+
+		// check Y axis
+		if(event.axis == 1)
+		{
+			if(event.value < -JOYSTICK_DEAD_ZONE)
+			{
+				yDir = -1.0f;
+			}else if(event.value > JOYSTICK_DEAD_ZONE)
+			{
+				yDir = 1.0f;
+			}else
+			{
+				yDir = 0.0f;
+			}
+		}
+	}
+}
+//update cursor on screen
+void UpdateCursor(float deltaTime)
+{
+
+	//Update cursor
+	pos_X += (cursorSpeed * xDir) * deltaTime;
+	pos_Y += (cursorSpeed * yDir) * deltaTime;
+
+	//assign to SDL_Rect ints X and Y
+	cursorPos.x = (int) (pos_X + 0.5f);
+	cursorPos.y = (int) (pos_Y + 0.5f);
+
+	//update active position of cursor - collision box
+	activePos.x = cursorPos.x;
+	activePos.y = cursorPos.y;
+
+	//off the screen in X
+	if(cursorPos.x < 0)
+	{
+		cursorPos.x = 0;
+		pos_X = cursorPos.x;
+	}
+	if(cursorPos.x > 1024 - cursorPos.w)
+	{
+		cursorPos.x = 1024 - cursorPos.w;
+		pos_X = cursorPos.x;
 	}
 
-
+	//off the screen in Y
+	if(cursorPos.y < 0)
+	{
+		cursorPos.y = 0;
+		pos_Y = cursorPos.y;
+	}
+	if(cursorPos.y > 768 - cursorPos.h)
+	{
+		cursorPos.y = 768 - cursorPos.h;
+		pos_Y = cursorPos.y;
+	}
 }
 
 
+
+bool players1Over = false, players2Over = false, instructionsOver = false,
+	quitOver = false, menuOver = false, playOver = false;
 
 
 int main(int argc, char* argv[]) {
@@ -100,7 +195,7 @@ int main(int argc, char* argv[]) {
 //get the current working directory
 	string s_cwd(getcwd(NULL, 0));
 
-	//create a string linking to the mac's images folder
+	//create a string linking to the linux's images folder
 	string s_cwd_images = s_cwd + "/Resources/Images";
 
 	//test
@@ -114,8 +209,8 @@ cout << "Added on Linux" << endl;
 //get the current working directory
 string s_cwd(getcwd(NULL, 0));
 
-//create a string linking to the mac's images folder
-string s_cwd_images = s_cwd + "/Resources/Images";
+//create a string linking to the Windows images folder
+string s_cwd_images = s_cwd + "\\Resources\\Images\\";
 cout << "Running on Windows" << endl;
 cout << "Added on Windows" << endl;
 #endif
@@ -148,8 +243,8 @@ cout << "Added on Windows" << endl;
     renderer = SDL_CreateRenderer(window,-1,SDL_RENDERER_ACCELERATED);
 
 
-
-
+    //create players
+    Player player1 = Player(renderer, 0, s_cwd_images.c_str(), 250.0, 500.0);
 
     //****** Create Background ******
     string BKGDpath = s_cwd_images + "/Bacground.png";
@@ -187,10 +282,10 @@ cout << "Added on Windows" << endl;
     bkgd2Pos.w=1024;
     bkgd2Pos.h=768;
 
-    //********Backgrounds - END***********//
+    //*****************Backgrounds - END********************//
 
 
-    //***** Create CURSOR*****
+    //***************** Create CURSOR*****************
     //create cursor
     string CURSORpath = s_cwd_images + "/CursorNew.png";
 
@@ -208,7 +303,7 @@ cout << "Added on Windows" << endl;
     SDL_FreeSurface(surface);
 
     // create the SDL_Rectangle for the texture's position and size - x,y,w,h
-    SDL_Rect cursorPos, activePos;
+    //SDL_Rect cursorPos, activePos;
 
     // set the X,Y,W, and H for the Rectangle - cursor graphic
     cursorPos.x=0;
@@ -224,13 +319,14 @@ cout << "Added on Windows" << endl;
 
 
     //var for cursor speed
-    int cursorSpeed = 400;
+    //int cursorSpeed = 400;
 
     //*************CURSOR - END**************
 
-    //****** Create Menu - START ******
 
-    // ********* TITLE - START******
+    //***************** Create Menu - START *****************
+
+    // ****************** TITLE - START****************
     string Titlepath = s_cwd_images + "/Title.png";
 
     // create a SDL surface to hold the title image
@@ -428,9 +524,6 @@ cout << "Added on Windows" << endl;
      //********Quit - END***********
 
 
-
-
-
     //*****************CREATE MENU - END********************
 
 
@@ -501,10 +594,10 @@ cout << "Added on Windows" << endl;
 
 
 	 // set the X,Y,W, and H for the Rectangle
-	 MenuPos.x = 233;
-	 MenuPos.y = 253;
-	 MenuPos.w = 539;
-	 MenuPos.h = 215;
+	 MenuPos.x = 128;
+	 MenuPos.y = 659;
+	 MenuPos.w = 227;
+	 MenuPos.h = 41;
 
 	 //********TEXT - END***********
 
@@ -645,25 +738,39 @@ cout << "Added on Windows" << endl;
 							{
 								if(event.cbutton.button == SDL_CONTROLLER_BUTTON_A)
 								{
-									menu = false;
-									gameState = INSTRUCTIONS;
-								}
-								if(event.cbutton.button == SDL_CONTROLLER_BUTTON_B)
-								{
-									menu = false;
-									gameState = PLAYERS1;
-								}
-								if(event.cbutton.button == SDL_CONTROLLER_BUTTON_X)
-								{
-									menu = false;
-									gameState = PLAYERS2;
-								}
-								if(event.cbutton.button == SDL_CONTROLLER_BUTTON_Y)
-								{
-									menu = false;
-									quit = true;
+									//if player chooses 1 player game
+									if(players1Over)
+									{
+										menu = false;
+										gameState = PLAYERS1;
+										players1Over = false;
+									}
+									//if player chooses 2 player game
+									if(players2Over)
+									{
+										menu = false;
+										gameState = PLAYERS2;
+										players2Over = false;
+									}
+									//if player chooses instructions
+									if(instructionsOver)
+									{
+										menu = false;
+										gameState = INSTRUCTIONS;
+										instructionsOver = false;
+									}
+									//if player chooses quit
+									if(quitOver)
+									{
+										menu = false;
+										quit = true;
+										quitOver = false;
+									}
 								}
 							}
+							break;
+						case SDL_CONTROLLERAXISMOTION:
+							moveCursor(event.caxis);
 							break;
 						}
 					}
@@ -672,7 +779,15 @@ cout << "Added on Windows" << endl;
 					//Update
 					UpdateBackground();
 
+					//Update Cursor
+					UpdateCursor(deltaTime);
 
+
+					//check for collision between cursor active state and buttons
+					players1Over = SDL_HasIntersection(&activePos, &players1NPos);
+					players2Over = SDL_HasIntersection(&activePos, &players2NPos);
+					instructionsOver = SDL_HasIntersection(&activePos, &InstructionsNPos);
+					quitOver = SDL_HasIntersection(&activePos, &QuitNPos);
 
 					// Start Drawing
 					//Clear SDL renderer
@@ -691,17 +806,40 @@ cout << "Added on Windows" << endl;
 					SDL_RenderCopy(renderer, title, NULL, &titlePos);
 
 					//Draw One Player image
+					if(players1Over)
+					{
+						SDL_RenderCopy(renderer, players1O, NULL, &players1NPos);
+					}else
+					{
 					SDL_RenderCopy(renderer, players1N, NULL, &players1NPos);
-
+					}
 					//Draw Two Player image
+					if(players2Over)
+					{
+						SDL_RenderCopy(renderer, players2O, NULL, &players2NPos);
+					}else
+					{
 					SDL_RenderCopy(renderer, players2N, NULL, &players2NPos);
+					}
 
 					//Draw Instructions image
+					if(instructionsOver)
+					{
+						SDL_RenderCopy(renderer, InstructionsO, NULL, &InstructionsNPos);
+					}else
+					{
 					SDL_RenderCopy(renderer, InstructionsN, NULL, &InstructionsNPos);
+					}
 
 
 					//Draw Quit image
+					if(quitOver)
+					{
+						SDL_RenderCopy(renderer, QuitO, NULL, &QuitNPos);
+					}else
+					{
 					SDL_RenderCopy(renderer, QuitN, NULL, &QuitNPos);
+					}
 
 
 					//Draw the cursor image
@@ -827,17 +965,24 @@ cout << "Added on Windows" << endl;
 
 							if(event.cdevice.which == 0)
 							{
-								if(event.cbutton.button == SDL_CONTROLLER_BUTTON_A)
+								if(event.cbutton.button == SDL_CONTROLLER_BUTTON_X)
 								{
 									players1 = false;
 									gameState = WIN;
 								}
-								if(event.cbutton.button == SDL_CONTROLLER_BUTTON_B)
+								if(event.cbutton.button == SDL_CONTROLLER_BUTTON_Y)
 								{
 									players1 = false;
 									gameState = LOSE;
 								}
+
+								//send button press info to player1
+								player1.OnControllerButton(event.cbutton);
 							}
+							break;
+						case SDL_CONTROLLERAXISMOTION:
+
+							player1.OnControllerAxis(event.caxis);
 							break;
 						}
 					}
@@ -845,6 +990,9 @@ cout << "Added on Windows" << endl;
 
 					//Update
 					UpdateBackground();
+
+					//Update player
+					player1.Update(deltaTime);
 
 
 					// Start Drawing
@@ -867,7 +1015,10 @@ cout << "Added on Windows" << endl;
 					//SDL_RenderCopy(renderer, InstText, NULL, &InstTextPos);
 
 					//Draw the cursor image
-					SDL_RenderCopy(renderer, cursor, NULL, &cursorPos);
+					//SDL_RenderCopy(renderer, cursor, NULL, &cursorPos);
+
+					//Draw player image
+					player1.Draw(renderer);
 
 
 					// SDL Render present
