@@ -97,12 +97,25 @@ int main(int argc, char* argv[]) {
 
 //Output for Linux
 #if defined(__linux__)
+//get the current working directory
+	string s_cwd(getcwd(NULL, 0));
+
+	//create a string linking to the mac's images folder
+	string s_cwd_images = s_cwd + "/Resources/Images";
+
+	//test
+	cout << s_cwd_images << endl;
 cout << "Running on Linux" << endl;
 cout << "Added on Linux" << endl;
 #endif
 
 //Output for Windows
 #if defined(_WIN32) || (_WIN64)
+//get the current working directory
+string s_cwd(getcwd(NULL, 0));
+
+//create a string linking to the mac's images folder
+string s_cwd_images = s_cwd + "/Resources/Images";
 cout << "Running on Windows" << endl;
 cout << "Added on Windows" << endl;
 #endif
@@ -450,7 +463,116 @@ cout << "Added on Windows" << endl;
 
      //********TEXT - END***********
 
-     //****** Create INSTRUCTIONS GRAPHICS - START **********
+
+	 //****** Create INSTRUCTIONS GRAPHICS - START **********
+
+	 // ********* TEXT - START******
+	 string Menupath = s_cwd_images + "/Menu.png";
+
+	 // create a SDL surface to hold the title image
+	 surface = IMG_Load(Menupath.c_str());
+
+	 // create a SDL texture
+	 SDL_Texture *Menu;
+
+	 //place surface into the texture title
+	 Menu = SDL_CreateTextureFromSurface(renderer, surface);
+
+	 //free the SDL surface
+	 SDL_FreeSurface(surface);
+
+
+	 string MenuOpath = s_cwd_images + "/MenuO.png";
+
+	 // create a SDL surface to hold the title image
+	 surface = IMG_Load(MenuOpath.c_str());
+
+	 // create a SDL texture
+	 SDL_Texture *MenuO;
+
+	 //place surface into the texture title
+	 MenuO = SDL_CreateTextureFromSurface(renderer, surface);
+
+	 //free the SDL surface
+	 SDL_FreeSurface(surface);
+
+	 // create SDL Rectangle for the title graphic
+	 SDL_Rect MenuPos;
+
+
+	 // set the X,Y,W, and H for the Rectangle
+	 MenuPos.x = 233;
+	 MenuPos.y = 253;
+	 MenuPos.w = 539;
+	 MenuPos.h = 215;
+
+	 //********TEXT - END***********
+
+     //****** Create INSTRUCTIONS GRAPHICS - END **********
+
+
+	 //****** Create WIN GRAPHICS - START **********
+
+	 // ********* TEXT - START******
+	 string WinTextpath = s_cwd_images + "/WinText.png";
+
+	 // create a SDL surface to hold the title image
+	 surface = IMG_Load(WinTextpath.c_str());
+
+	 // create a SDL texture
+	 SDL_Texture *WinText;
+
+	 //place surface into the texture title
+	 WinText = SDL_CreateTextureFromSurface(renderer, surface);
+
+	 //free the SDL surface
+	 SDL_FreeSurface(surface);
+
+	 // create SDL Rectangle for the title graphic
+	 SDL_Rect WinTextPos;
+
+
+	 // set the X,Y,W, and H for the Rectangle
+	 WinTextPos.x = 317;
+	 WinTextPos.y = 268;
+	 WinTextPos.w = 379;
+	 WinTextPos.h = 106;
+
+	 //********TEXT - END***********
+
+	 //****** Create WIN GRAPHICS - END **********
+
+
+	 //****** Create LOSE GRAPHICS - START **********
+
+	 // ********* TEXT - START******
+	 string LoseTextpath = s_cwd_images + "/LoseText.png";
+
+	 // create a SDL surface to hold the title image
+	 surface = IMG_Load(LoseTextpath.c_str());
+
+	 // create a SDL texture
+	 SDL_Texture *LoseText;
+
+	 //place surface into the texture title
+	 LoseText = SDL_CreateTextureFromSurface(renderer, surface);
+
+	 //free the SDL surface
+	 SDL_FreeSurface(surface);
+
+	 // create SDL Rectangle for the title graphic
+	 SDL_Rect LoseTextPos;
+
+
+	 // set the X,Y,W, and H for the Rectangle
+	 LoseTextPos.x = 264;
+	 LoseTextPos.y = 272;
+	 LoseTextPos.w = 507;
+	 LoseTextPos.h = 99;
+
+	 //********TEXT - END***********
+
+	 //****** Create LOSE GRAPHICS - END **********
 
 
 
@@ -662,6 +784,9 @@ cout << "Added on Windows" << endl;
 					//Draw the Instructions Text image
 					SDL_RenderCopy(renderer, InstText, NULL, &InstTextPos);
 
+					//Draw the Menu Button image
+					SDL_RenderCopy(renderer, Menu, NULL, &MenuPos);
+
 					//Draw the cursor image
 					SDL_RenderCopy(renderer, cursor, NULL, &cursorPos);
 
@@ -716,6 +841,37 @@ cout << "Added on Windows" << endl;
 							break;
 						}
 					}
+
+
+					//Update
+					UpdateBackground();
+
+
+					// Start Drawing
+					//Clear SDL renderer
+					SDL_RenderClear(renderer);
+
+
+
+
+					//Draw the bkgd1 image
+					SDL_RenderCopy(renderer, bkgd1, NULL, &bkgd1Pos);
+
+					//Draw the bkgd2 image
+					SDL_RenderCopy(renderer, bkgd2, NULL, &bkgd2Pos);
+
+					//Draw the title image
+					SDL_RenderCopy(renderer, title, NULL, &titlePos);
+
+					//Draw the Instructions Text image
+					//SDL_RenderCopy(renderer, InstText, NULL, &InstTextPos);
+
+					//Draw the cursor image
+					SDL_RenderCopy(renderer, cursor, NULL, &cursorPos);
+
+
+					// SDL Render present
+					SDL_RenderPresent(renderer);
 				}
 
 				break;	// end players1 case
@@ -761,6 +917,37 @@ cout << "Added on Windows" << endl;
 							break;
 						}
 					}
+
+
+					//Update
+					UpdateBackground();
+
+
+					// Start Drawing
+					//Clear SDL renderer
+					SDL_RenderClear(renderer);
+
+
+
+
+					//Draw the bkgd1 image
+					SDL_RenderCopy(renderer, bkgd1, NULL, &bkgd1Pos);
+
+					//Draw the bkgd2 image
+					SDL_RenderCopy(renderer, bkgd2, NULL, &bkgd2Pos);
+
+					//Draw the title image
+					SDL_RenderCopy(renderer, title, NULL, &titlePos);
+
+					//Draw the Instructions Text image
+					//SDL_RenderCopy(renderer, InstText, NULL, &InstTextPos);
+
+					//Draw the cursor image
+					SDL_RenderCopy(renderer, cursor, NULL, &cursorPos);
+
+
+					// SDL Render present
+					SDL_RenderPresent(renderer);
 				}
 
 				break;	// end players2 case
@@ -806,6 +993,41 @@ cout << "Added on Windows" << endl;
 							break;
 						}
 					}
+
+
+
+					//Update
+					UpdateBackground();
+
+
+					// Start Drawing
+					//Clear SDL renderer
+					SDL_RenderClear(renderer);
+
+
+
+
+					//Draw the bkgd1 image
+					SDL_RenderCopy(renderer, bkgd1, NULL, &bkgd1Pos);
+
+					//Draw the bkgd2 image
+					SDL_RenderCopy(renderer, bkgd2, NULL, &bkgd2Pos);
+
+					//Draw the title image
+					SDL_RenderCopy(renderer, title, NULL, &titlePos);
+
+					//Draw the Instructions Text image
+					SDL_RenderCopy(renderer, WinText, NULL, &InstTextPos);
+
+					//Draw the Menu Button image
+					SDL_RenderCopy(renderer, Menu, NULL, &MenuPos);
+
+					//Draw the cursor image
+					SDL_RenderCopy(renderer, cursor, NULL, &cursorPos);
+
+
+					// SDL Render present
+					SDL_RenderPresent(renderer);
 				}
 
 				break;	// end Win case
@@ -852,6 +1074,40 @@ cout << "Added on Windows" << endl;
 							break;
 						}
 					}
+
+
+					//Update
+					UpdateBackground();
+
+
+					// Start Drawing
+					//Clear SDL renderer
+					SDL_RenderClear(renderer);
+
+
+
+
+					//Draw the bkgd1 image
+					SDL_RenderCopy(renderer, bkgd1, NULL, &bkgd1Pos);
+
+					//Draw the bkgd2 image
+					SDL_RenderCopy(renderer, bkgd2, NULL, &bkgd2Pos);
+
+					//Draw the title image
+					SDL_RenderCopy(renderer, title, NULL, &titlePos);
+
+					//Draw the Instructions Text image
+					SDL_RenderCopy(renderer, LoseText, NULL, &InstTextPos);
+
+					//Draw the Menu Button image
+					SDL_RenderCopy(renderer, Menu, NULL, &MenuPos);
+
+					//Draw the cursor image
+					SDL_RenderCopy(renderer, cursor, NULL, &cursorPos);
+
+
+					// SDL Render present
+					SDL_RenderPresent(renderer);
 				}
 
 				break;	// end Lose case
