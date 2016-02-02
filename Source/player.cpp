@@ -3,8 +3,9 @@
 //Analog joystic dead zone
 const int JOYSTICK_DEAD_ZONE = 8000;
 
+
 //Player creation method
-Player::Player(SDL Renderer *renderer, int pNum, string filePath, float x, float y)
+Player::Player(SDL_Renderer *renderer, int pNum, string filePath, float x, float y)
 {
 	//set the player number 0 or 1;
 	playerNum = pNum;

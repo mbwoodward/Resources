@@ -46,7 +46,7 @@ public:
 	float speed;
 
 	//float for the player's position to avoid precision loss
-	float pos_X, pls_Y;
+	float pos_X, pos_Y;
 
 	//Player's creation method using passed in values for renderer, player number, path to the texture
 	//starting position X, starting position Y
