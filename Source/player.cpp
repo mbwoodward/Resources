@@ -3,7 +3,6 @@
 //Analog joystic dead zone
 const int JOYSTICK_DEAD_ZONE = 8000;
 
-
 //Player creation method
 Player::Player(SDL_Renderer *renderer, int pNum, string filePath, float x, float y)
 {
@@ -32,7 +31,6 @@ Player::Player(SDL_Renderer *renderer, int pNum, string filePath, float x, float
 
 	//set the SDL_Rect X and Y for the player
 	posRect.x = x;
-
 	posRect.y = y;
 
 	//Use SDL_QueryTexture to get the kW and H of the player's texture
@@ -58,8 +56,8 @@ Player::Player(SDL_Renderer *renderer, int pNum, string filePath, float x, float
 void Player::Update(float deltaTime)
 {
 	//Adjust position floats based on speed, direction of joystick axis and deltaTime
-	pos_X += (speed *xDir) *deltaTime;
-	pos_Y += (speed *yDir) *deltaTime;
+	pos_X += (speed * xDir) * deltaTime;
+	pos_Y += (speed * yDir) * deltaTime;
 
 	//update player position with code to account for precision loss
 	posRect.x = (int)(pos_X + 0.5f);
@@ -103,7 +101,7 @@ void Player::OnControllerButton(const SDL_ControllerButtonEvent event)
 		//if A Button
 		if(event.button == 0)
 		{
-			cout << "Plyaer 1 - Button A" << endl;
+			cout << "Player 1 - Button A" << endl;
 		}
 	}
 
@@ -113,7 +111,7 @@ void Player::OnControllerButton(const SDL_ControllerButtonEvent event)
 		//if A Button
 		if(event.button == 0)
 		{
-			cout << "Plyaer 2 - Button A" << endl;
+			cout << "Player 2 - Button A" << endl;
 		}
 	}
 }
@@ -123,8 +121,8 @@ void Player::OnControllerAxis(const SDL_ControllerAxisEvent event)
 {
 	// Axis movements and button presses both sent here as SDL_ControllerAxisEvent structures
 
-	//if the playser's number is 0 and the joystick axis is from joystick 0
-	if(event.which == playerNum == 0)
+	//if the player's number is 0 and the joystick axis is from joystick 0
+	if(event.which == 0 && playerNum == 0)
 	{
 		//X axis
 		if(event.axis == 0)

@@ -26,7 +26,6 @@
 #include <unistd.h>
 #endif
 
-#include "player.h"
 #include <stdio.h>
 #include <iostream>
 using namespace std;
@@ -47,13 +46,13 @@ SDL_Rect bkgd1Pos;
 SDL_Rect bkgd2Pos;
 
 //move the background
-void UpdateBackground()
+void UpdateBackground(float deltaTime)
 {
 	//Update Background 1
-	BG1pos_Y += (bkgdSpeed * 1)* deltaTime;
+	BG1pos_Y += (bkgdSpeed * 1)*deltaTime;
 
 	//set the new bkgd1 position
-	bkgd1Pos.y = (int)(BG1pos_Y + .5f);
+	bkgd1Pos.y = (int)(BG1pos_Y + 0.5f);
 
 	//reset when off the bottom of the screen
 	if(bkgd1Pos.y >= 768)
@@ -63,10 +62,10 @@ void UpdateBackground()
 	}
 
 	//Update Background 2
-	BG2pos_Y += (bkgdSpeed * 1)* deltaTime;
+	BG2pos_Y += (bkgdSpeed * 1)*deltaTime;
 
 	//set the new bkgd2 position
-	bkgd2Pos.y = (int)(BG2pos_Y + .5f);
+	bkgd2Pos.y = (int)(BG2pos_Y + 0.5f);
 
 	//reset when off the bottom of the screen
 	if(bkgd2Pos.y >= 768)
@@ -75,6 +74,8 @@ void UpdateBackground()
 		BG2pos_Y = bkgd2Pos.y;
 	}
 }
+//*************END OF UPDATEBACKGROUND**********
+
 
 //new joystick vars
 //Analog joystick dead zone
@@ -128,6 +129,8 @@ void moveCursor(const SDL_ControllerAxisEvent event)
 		}
 	}
 }
+//**********END OF MOVECURSOR
+
 //update cursor on screen
 void UpdateCursor(float deltaTime)
 {
@@ -168,13 +171,17 @@ void UpdateCursor(float deltaTime)
 		pos_Y = cursorPos.y;
 	}
 }
+//*************END OF UPDATECURSOR************
 
 
 
 bool players1Over = false, players2Over = false, instructionsOver = false,
 	quitOver = false, menuOver = false, playOver = false;
 
+//class header includes
+#include "player.h"
 
+//**********************************MAIN - START***************************************
 int main(int argc, char* argv[]) {
 
 //Output for Apple
@@ -184,7 +191,7 @@ int main(int argc, char* argv[]) {
 	string s_cwd(getcwd(NULL,0));
 
 	//create a string linking to the mac's images folder
-	string s_cwd_images = s_cwd + "/Resources/Images";
+	string s_cwd_images = s_cwd + "/Resources/Images/";
 
 	//test
 	cout << s_cwd_images << endl;
@@ -196,7 +203,7 @@ int main(int argc, char* argv[]) {
 	string s_cwd(getcwd(NULL, 0));
 
 	//create a string linking to the linux's images folder
-	string s_cwd_images = s_cwd + "/Resources/Images";
+	string s_cwd_images = s_cwd + "/Resources/Images/";
 
 	//test
 	cout << s_cwd_images << endl;
@@ -247,7 +254,7 @@ cout << "Added on Windows" << endl;
     Player player1 = Player(renderer, 0, s_cwd_images.c_str(), 250.0, 500.0);
 
     //****** Create Background ******
-    string BKGDpath = s_cwd_images + "/Bacground.png";
+    string BKGDpath = s_cwd_images + "Bacground.png";
 
     // create a SDL surface to hold the background image
     SDL_Surface *surface = IMG_Load(BKGDpath.c_str());
@@ -287,7 +294,7 @@ cout << "Added on Windows" << endl;
 
     //***************** Create CURSOR*****************
     //create cursor
-    string CURSORpath = s_cwd_images + "/CursorNew.png";
+    string CURSORpath = s_cwd_images + "CursorNew.png";
 
     // create a SDL surface to hold the background image
     surface = IMG_Load(CURSORpath.c_str());
@@ -327,7 +334,7 @@ cout << "Added on Windows" << endl;
     //***************** Create Menu - START *****************
 
     // ****************** TITLE - START****************
-    string Titlepath = s_cwd_images + "/Title.png";
+    string Titlepath = s_cwd_images + "Title.png";
 
     // create a SDL surface to hold the title image
     surface = IMG_Load(Titlepath.c_str());
@@ -356,7 +363,7 @@ cout << "Added on Windows" << endl;
 
     // ********* ONE PLAYER - START******
 
-    string Ply1path = s_cwd_images + "/OnePlayer.png";
+    string Ply1path = s_cwd_images + "OnePlayer.png";
 
     // create a SDL surface to hold the title image
     surface = IMG_Load(Ply1path.c_str());
@@ -370,7 +377,7 @@ cout << "Added on Windows" << endl;
     //free the SDL surface
     SDL_FreeSurface(surface);
 
-    string Ply1Opath = s_cwd_images + "/OnePlayerO.png";
+    string Ply1Opath = s_cwd_images + "OnePlayerO.png";
 
     // create a SDL surface to hold the title image
     surface = IMG_Load(Ply1Opath.c_str());
@@ -399,7 +406,7 @@ cout << "Added on Windows" << endl;
 
     // ********* TWO PLAYER - START******
 
-    string Ply2path = s_cwd_images + "/TwoPlayer.png";
+    string Ply2path = s_cwd_images + "TwoPlayer.png";
 
     // create a SDL surface to hold the title image
     surface = IMG_Load(Ply2path.c_str());
@@ -413,7 +420,7 @@ cout << "Added on Windows" << endl;
     //free the SDL surface
     SDL_FreeSurface(surface);
 
-    string Ply2Opath = s_cwd_images + "/TwoPlayerO.png";
+    string Ply2Opath = s_cwd_images + "TwoPlayerO.png";
 
     // create a SDL surface to hold the title image
     surface = IMG_Load(Ply2Opath.c_str());
@@ -441,7 +448,7 @@ cout << "Added on Windows" << endl;
 
     // ********* INSTRUCTIONS - START******
 
-    string Instructionspath = s_cwd_images + "/Instructions.png";
+    string Instructionspath = s_cwd_images + "Instructions.png";
 
     // create a SDL surface to hold the title image
     surface = IMG_Load(Instructionspath.c_str());
@@ -455,7 +462,7 @@ cout << "Added on Windows" << endl;
     //free the SDL surface
     SDL_FreeSurface(surface);
 
-    string InstructionsOpath = s_cwd_images + "/InstructionsO.png";
+    string InstructionsOpath = s_cwd_images + "InstructionsO.png";
 
     // create a SDL surface to hold the title image
     surface = IMG_Load(InstructionsOpath.c_str());
@@ -483,7 +490,7 @@ cout << "Added on Windows" << endl;
 
     // ********* QUIT - START******
 
-     string Quitpath = s_cwd_images + "/Quit.png";
+     string Quitpath = s_cwd_images + "Quit.png";
 
      // create a SDL surface to hold the title image
      surface = IMG_Load(Quitpath.c_str());
@@ -497,7 +504,7 @@ cout << "Added on Windows" << endl;
      //free the SDL surface
      SDL_FreeSurface(surface);
 
-     string QuitOpath = s_cwd_images + "/QuitO.png";
+     string QuitOpath = s_cwd_images + "QuitO.png";
 
      // create a SDL surface to hold the title image
      surface = IMG_Load(QuitOpath.c_str());
@@ -530,7 +537,7 @@ cout << "Added on Windows" << endl;
      //****** Create INSTRUCTIONS GRAPHICS - START **********
 
      // ********* TEXT - START******
-     string InstructionsTextpath = s_cwd_images + "/InstructionsText.png";
+     string InstructionsTextpath = s_cwd_images + "InstructionsText.png";
 
      // create a SDL surface to hold the title image
      surface = IMG_Load(InstructionsTextpath.c_str());
@@ -560,7 +567,7 @@ cout << "Added on Windows" << endl;
 	 //****** Create INSTRUCTIONS GRAPHICS - START **********
 
 	 // ********* TEXT - START******
-	 string Menupath = s_cwd_images + "/Menu.png";
+	 string Menupath = s_cwd_images + "Menu.png";
 
 	 // create a SDL surface to hold the title image
 	 surface = IMG_Load(Menupath.c_str());
@@ -575,7 +582,7 @@ cout << "Added on Windows" << endl;
 	 SDL_FreeSurface(surface);
 
 
-	 string MenuOpath = s_cwd_images + "/MenuO.png";
+	 string MenuOpath = s_cwd_images + "MenuO.png";
 
 	 // create a SDL surface to hold the title image
 	 surface = IMG_Load(MenuOpath.c_str());
@@ -601,13 +608,55 @@ cout << "Added on Windows" << endl;
 
 	 //********TEXT - END***********
 
+	 // ********* PLAY AGAIN - START******
+	 string Playpath = s_cwd_images + "PlayAgain.png";
+
+	 // create a SDL surface to hold the title image
+	 surface = IMG_Load(Playpath.c_str());
+
+	 // create a SDL texture
+	 SDL_Texture *Play;
+
+	 //place surface into the texture title
+	 Play = SDL_CreateTextureFromSurface(renderer, surface);
+
+	 //free the SDL surface
+	 SDL_FreeSurface(surface);
+
+
+	 string PlayOpath = s_cwd_images + "PlayAgainO.png";
+
+	 // create a SDL surface to hold the title image
+	 surface = IMG_Load(PlayOpath.c_str());
+
+	 // create a SDL texture
+	 SDL_Texture *PlayO;
+
+	 //place surface into the texture title
+	 PlayO = SDL_CreateTextureFromSurface(renderer, surface);
+
+	 //free the SDL surface
+	 SDL_FreeSurface(surface);
+
+	 // create SDL Rectangle for the title graphic
+	 SDL_Rect PlayPos;
+
+
+	 // set the X,Y,W, and H for the Rectangle
+	 PlayPos.x = 644;
+	 PlayPos.y = 659;
+	 PlayPos.w = 205;
+	 PlayPos.h = 49;
+
+	 //********PLAY AGAIN - END***********
+
      //****** Create INSTRUCTIONS GRAPHICS - END **********
 
 
 	 //****** Create WIN GRAPHICS - START **********
 
 	 // ********* TEXT - START******
-	 string WinTextpath = s_cwd_images + "/WinText.png";
+	 string WinTextpath = s_cwd_images + "WinText.png";
 
 	 // create a SDL surface to hold the title image
 	 surface = IMG_Load(WinTextpath.c_str());
@@ -639,7 +688,7 @@ cout << "Added on Windows" << endl;
 	 //****** Create LOSE GRAPHICS - START **********
 
 	 // ********* TEXT - START******
-	 string LoseTextpath = s_cwd_images + "/LoseText.png";
+	 string LoseTextpath = s_cwd_images + "LoseText.png";
 
 	 // create a SDL surface to hold the title image
 	 surface = IMG_Load(LoseTextpath.c_str());
@@ -699,12 +748,6 @@ cout << "Added on Windows" << endl;
 		{
 			case MENU:
 				menu = true;
-				cout << "The Game State is Menu" << endl;
-				cout << "Press the A Button for Instructions" << endl;
-				cout << "Press the B Button for 1 Player Game" << endl;
-				cout << "Press the X Button for 2 Player Game" << endl;
-				cout << "Press the Y Button for Quit Game" << endl;
-				cout << endl;
 
 				while(menu)
 				{
@@ -777,7 +820,7 @@ cout << "Added on Windows" << endl;
 
 
 					//Update
-					UpdateBackground();
+					UpdateBackground(deltaTime);
 
 					//Update Cursor
 					UpdateCursor(deltaTime);
@@ -856,9 +899,6 @@ cout << "Added on Windows" << endl;
 
 			case INSTRUCTIONS:
 				instructions = true;
-				cout << "The Game State is Instructions" << endl;
-				cout << "Press the A Button for Main Menu" << endl;
-				cout << endl;
 
 				while(instructions)
 				{
@@ -887,20 +927,31 @@ cout << "Added on Windows" << endl;
 						{
 						case SDL_CONTROLLERBUTTONDOWN:
 
-							if(event.cdevice.which == 0)
+							if(event.cbutton.button == SDL_CONTROLLER_BUTTON_A)
 							{
-								if(event.cbutton.button == SDL_CONTROLLER_BUTTON_A)
+								//if player chooses menu
+								if(menuOver)
 								{
-									instructions = false;
-									gameState = MENU;
+								instructions = false;
+								gameState = MENU;
+								menuOver = false;
 								}
 							}
+							break;
+						case SDL_CONTROLLERAXISMOTION:
+							moveCursor(event.caxis);
 							break;
 						}
 					}
 
 					//Update
-					UpdateBackground();
+					UpdateBackground(deltaTime);
+
+					//Update Cursor
+					UpdateCursor(deltaTime);
+
+					//check for cursor intersection with menu button
+					menuOver = SDL_HasIntersection(&activePos, &MenuPos);
 
 
 					// Start Drawing
@@ -922,8 +973,14 @@ cout << "Added on Windows" << endl;
 					//Draw the Instructions Text image
 					SDL_RenderCopy(renderer, InstText, NULL, &InstTextPos);
 
-					//Draw the Menu Button image
+					//Draw Menu image
+					if(menuOver)
+					{
+						SDL_RenderCopy(renderer, MenuO, NULL, &MenuPos);
+					}else
+					{
 					SDL_RenderCopy(renderer, Menu, NULL, &MenuPos);
+					}
 
 					//Draw the cursor image
 					SDL_RenderCopy(renderer, cursor, NULL, &cursorPos);
@@ -989,7 +1046,7 @@ cout << "Added on Windows" << endl;
 
 
 					//Update
-					UpdateBackground();
+					UpdateBackground(deltaTime);
 
 					//Update player
 					player1.Update(deltaTime);
@@ -1071,7 +1128,7 @@ cout << "Added on Windows" << endl;
 
 
 					//Update
-					UpdateBackground();
+					UpdateBackground(deltaTime);
 
 
 					// Start Drawing
@@ -1105,10 +1162,6 @@ cout << "Added on Windows" << endl;
 
 			case WIN:
 				win = true;
-				cout << "The Game State is Win" << endl;
-				cout << "Press the A Button for Main Menu" << endl;
-				cout << "Press the B Button to Quit" << endl;
-				cout << endl;
 
 				while(win)
 				{
@@ -1128,19 +1181,25 @@ cout << "Added on Windows" << endl;
 						{
 						case SDL_CONTROLLERBUTTONDOWN:
 
-							if(event.cdevice.which == 0)
+							if(event.cbutton.button == SDL_CONTROLLER_BUTTON_A)
 							{
-								if(event.cbutton.button == SDL_CONTROLLER_BUTTON_A)
+								//if player chooses menu
+								if(menuOver)
 								{
-									win = false;
-									gameState = MENU;
+								win = false;
+								gameState = MENU;
+								menuOver = false;
 								}
-								if(event.cbutton.button == SDL_CONTROLLER_BUTTON_B)
+								if(playOver)
 								{
 									win = false;
-									quit = true;
+									gameState = PLAYERS1;
+									playOver = false;
 								}
 							}
+							break;
+						case SDL_CONTROLLERAXISMOTION:
+							moveCursor(event.caxis);
 							break;
 						}
 					}
@@ -1148,7 +1207,16 @@ cout << "Added on Windows" << endl;
 
 
 					//Update
-					UpdateBackground();
+					UpdateBackground(deltaTime);
+
+					//UpdateCursor
+					UpdateCursor(deltaTime);
+
+					//check for cursor intersection with menu button
+					menuOver = SDL_HasIntersection(&activePos, &MenuPos);
+
+					//check for cursor intersection with Play button
+					playOver = SDL_HasIntersection(&activePos, &PlayPos);
 
 
 					// Start Drawing
@@ -1167,11 +1235,27 @@ cout << "Added on Windows" << endl;
 					//Draw the title image
 					SDL_RenderCopy(renderer, title, NULL, &titlePos);
 
-					//Draw the Instructions Text image
-					SDL_RenderCopy(renderer, WinText, NULL, &InstTextPos);
+					//Draw the Win Text image
+					SDL_RenderCopy(renderer, WinText, NULL, &WinTextPos);
 
-					//Draw the Menu Button image
+					//Draw the menu button
+					if(menuOver)
+					{
+						SDL_RenderCopy(renderer, MenuO, NULL, &MenuPos);
+					}else
+					{
 					SDL_RenderCopy(renderer, Menu, NULL, &MenuPos);
+					}
+
+
+					//Draw the Play Button image
+					if(playOver)
+					{
+						SDL_RenderCopy(renderer, PlayO, NULL, &PlayPos);
+					}else
+					{
+					SDL_RenderCopy(renderer, Play, NULL, &PlayPos);
+					}
 
 					//Draw the cursor image
 					SDL_RenderCopy(renderer, cursor, NULL, &cursorPos);
@@ -1186,10 +1270,6 @@ cout << "Added on Windows" << endl;
 
 			case LOSE:
 				lose = true;
-				cout << "The Game State is Lose" << endl;
-				cout << "Press the A Button for Main Menu" << endl;
-				cout << "Press the B Button to Quit" << endl;
-				cout << endl;
 
 				while(lose)
 				{
@@ -1209,26 +1289,41 @@ cout << "Added on Windows" << endl;
 						{
 						case SDL_CONTROLLERBUTTONDOWN:
 
-							if(event.cdevice.which == 0)
+							if(event.cbutton.button == SDL_CONTROLLER_BUTTON_A)
 							{
-								if(event.cbutton.button == SDL_CONTROLLER_BUTTON_A)
+								//if player chooses menu
+								if(menuOver)
 								{
-									lose = false;
-									gameState = MENU;
+								lose = false;
+								gameState = MENU;
+								menuOver = false;
 								}
-								if(event.cbutton.button == SDL_CONTROLLER_BUTTON_B)
+								if(playOver)
 								{
 									lose = false;
-									quit = true;
+									gameState = PLAYERS1;
+									playOver = false;
 								}
 							}
+							break;
+						case SDL_CONTROLLERAXISMOTION:
+							moveCursor(event.caxis);
 							break;
 						}
 					}
 
 
 					//Update
-					UpdateBackground();
+					UpdateBackground(deltaTime);
+
+					//Update Cursor
+					UpdateCursor(deltaTime);
+
+					//check for cursor intersection with menu button
+					menuOver = SDL_HasIntersection(&activePos, &MenuPos);
+
+					//check for cursor intersection with Play button
+					playOver = SDL_HasIntersection(&activePos, &PlayPos);
 
 
 					// Start Drawing
@@ -1248,10 +1343,26 @@ cout << "Added on Windows" << endl;
 					SDL_RenderCopy(renderer, title, NULL, &titlePos);
 
 					//Draw the Instructions Text image
-					SDL_RenderCopy(renderer, LoseText, NULL, &InstTextPos);
+					SDL_RenderCopy(renderer, LoseText, NULL, &LoseTextPos);
 
-					//Draw the Menu Button image
+					//Draw the menu button
+					if(menuOver)
+					{
+						SDL_RenderCopy(renderer, MenuO, NULL, &MenuPos);
+					}else
+					{
 					SDL_RenderCopy(renderer, Menu, NULL, &MenuPos);
+					}
+
+
+					//Draw the Play Button image
+					if(playOver)
+					{
+						SDL_RenderCopy(renderer, PlayO, NULL, &PlayPos);
+					}else
+					{
+					SDL_RenderCopy(renderer, Play, NULL, &PlayPos);
+					}
 
 					//Draw the cursor image
 					SDL_RenderCopy(renderer, cursor, NULL, &cursorPos);

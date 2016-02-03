@@ -15,6 +15,7 @@
 #endif
 
 //needed includes
+#include <string>
 #include <stdio.h>
 #include <iostream>
 using namespace std;
