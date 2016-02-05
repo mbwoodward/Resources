@@ -50,6 +50,30 @@ Player::Player(SDL_Renderer *renderer, int pNum, string filePath, float x, float
 	xDir = 0;
 	yDir = 0;
 
+	//String to create the path to the player's bullet image
+	string bulletPath;
+
+	//see if this is player 1, or player 2, and create the correct file path
+	if(playerNum == 0){
+		//Create the bullet 1 texture
+		bulletPath = filePath + "bullet.png";
+	}else{
+		//Create the bullet 2 texture
+		bulletPath = filePath + "bullet2.png";
+	}
+
+	//Create the player's bullet pool
+	for(int i = 0; i < 10; i++)
+	{
+		//create the bullet and move offscreen, out of the game play area
+		Bullet tmpBullet(renderer, bulletPath, -1000, -1000);
+
+		//add to bulletlist
+		bulletList.push_back(tmpBullet);
+
+	}
+
+
 }
 
 //Player Update method
@@ -84,6 +108,16 @@ void Player::Update(float deltaTime)
 		pos_Y = posRect.y;
 	}
 
+	//Update the player's bullets
+	for (int i = 0; i < bulletList.size(); i++)
+	{
+		//check to see if the bullet is active
+		if(bulletList[i].active){
+
+			//Update bullet
+			bulletList[i].Update(deltaTime);
+		}
+	}
 }
 
 //player draw method
@@ -91,6 +125,46 @@ void Player::Draw(SDL_Renderer *renderer)
 {
 	//Draw the player texture using the vars texture and posRect
 	SDL_RenderCopy(renderer, texture, NULL, &posRect);
+
+	//draw the player's bullets
+	for (int i = 0; i < bulletList.size(); i++)
+	{
+		//check to see if the bullet is active
+		if(bulletList[i].active){
+
+			//Draw Bullet
+			bulletList[i].Draw(renderer);
+		}
+	}
+}
+
+//Create a bullet
+void Player::CreateBullet(){
+	//see if there is a bullet active to fire
+	for(int i = 0; i < bulletList.size(); i++)
+	{
+		//see if the bullet is not active
+		if(bulletList[i].active == false){
+
+			//set bullet to active
+			bulletList[i].active = true;
+
+			//use some math in the x position to get the bullet close to
+			//the center of the player using player width
+			bulletList[i].posRect.x = (pos_X + (posRect.w/2));
+
+			//finishing aligning to the player center using the texture width
+			bulletList[i].posRect.x = (bulletList[i].posRect.x - (bulletList[i].posRect.w/2));
+			bulletList[i].posRect.y = posRect.y;
+
+			//Set the x and y positions of the bullet's float positions
+			bulletList[i].pos_X = pos_X;
+			bulletList[i].pos_Y = pos_Y;
+
+			//once bullet is found, break out of loop
+			break;
+		}
+	}
 }
 
 void Player::OnControllerButton(const SDL_ControllerButtonEvent event)
@@ -102,6 +176,9 @@ void Player::OnControllerButton(const SDL_ControllerButtonEvent event)
 		if(event.button == 0)
 		{
 			cout << "Player 1 - Button A" << endl;
+
+			//Create a bullet
+			CreateBullet();
 		}
 	}
 
@@ -112,6 +189,9 @@ void Player::OnControllerButton(const SDL_ControllerButtonEvent event)
 		if(event.button == 0)
 		{
 			cout << "Player 2 - Button A" << endl;
+
+			//Create a bullet
+			CreateBullet();
 		}
 	}
 }
@@ -139,7 +219,6 @@ void Player::OnControllerAxis(const SDL_ControllerAxisEvent event)
 			{
 				xDir = 0.0f;
 			}
-
 		}
 
 		//Y axis
@@ -157,11 +236,52 @@ void Player::OnControllerAxis(const SDL_ControllerAxisEvent event)
 			{
 				yDir = 0.0f;
 			}
-
 		}
 	}
 
+	//if the player's number is 1 and the joystick axis is from joystick 1
+	if(event.which == 1 && playerNum == 1)
+	{
+		//X axis
+		if(event.axis == 0)
+		{
+			if(event.value < -JOYSTICK_DEAD_ZONE)
+			{
+				xDir = -1.0f;
+			}
+			else if(event.value > JOYSTICK_DEAD_ZONE)
+			{
+				xDir = 1.0f;
+			}
+			else
+			{
+				xDir = 0.0f;
+			}
+		}
 
+		//Y axis
+		if(event.axis == 1)
+		{
+			if(event.value < -JOYSTICK_DEAD_ZONE)
+			{
+				yDir = -1.0f;
+			}
+			else if(event.value > JOYSTICK_DEAD_ZONE)
+			{
+				yDir = 1.0f;
+			}
+			else
+			{
+				yDir = 0.0f;
+			}
+		}
+	}
+}
+
+
+Player::~Player()
+{
+	SDL_DestroyTexture(texture);
 }
 
 

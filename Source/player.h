@@ -20,9 +20,16 @@
 #include <iostream>
 using namespace std;
 
+// Bullet includes
+#include <vector>
+#include "bullet.h"
+
 class Player
 {
 public:
+
+	//variable to hold the list of bullets
+	vector<Bullet> bulletList;
 
 	//string to hold the path to the player's texture
 	string playerPath;
@@ -66,6 +73,10 @@ public:
 	void OnControllerButton(const SDL_ControllerButtonEvent event);
 
 	// Player's destruction method
-	//~Player();
+	~Player();
+
+private:
+
+	void CreateBullet();
 
 };

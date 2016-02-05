@@ -252,6 +252,7 @@ cout << "Added on Windows" << endl;
 
     //create players
     Player player1 = Player(renderer, 0, s_cwd_images.c_str(), 250.0, 500.0);
+    Player player2 = Player(renderer, 1, s_cwd_images.c_str(), 750.0, 500.0);
 
     //****** Create Background ******
     string BKGDpath = s_cwd_images + "Bacground.png";
@@ -323,10 +324,6 @@ cout << "Added on Windows" << endl;
     activePos.y=10;
     activePos.w=10;
     activePos.h=10;
-
-
-    //var for cursor speed
-    //int cursorSpeed = 400;
 
     //*************CURSOR - END**************
 
@@ -716,16 +713,22 @@ cout << "Added on Windows" << endl;
 
 	 //****** Create LOSE GRAPHICS - END **********
 
+		//***** Turn on Game Controller Events
+		SDL_GameControllerEventState(SDL_ENABLE);
+
+	//******* set up a Game Controller variable - 2 *****//
+	SDL_GameController* gGameController0 = NULL;
+
+	//****** Open Game Controller - 1*****
+	gGameController0 = SDL_GameControllerOpen(0);
+
+	//******* set up a Game Controller variable - 2 *****//
+	SDL_GameController* gGameController1 = NULL;
+
+	//****** Open Game Controller - 2*****
+	gGameController1 = SDL_GameControllerOpen(0);
 
 
-	//******* set up a Game Controller variable *****//
-	SDL_GameController* gGameController = NULL;
-
-	//****** Open Game Controller*****
-	gGameController = SDL_GameControllerOpen(0);
-
-	//***** Turn on Game Controller Events
-	SDL_GameControllerEventState(SDL_ENABLE);
 
 	//***** SDL Event to handle input****
 	SDL_Event event;
@@ -1004,6 +1007,13 @@ cout << "Added on Windows" << endl;
 
 				while(players1)
 				{
+
+
+					//set up frame rate for the section, or CASE
+					thisTime = SDL_GetTicks();
+					deltaTime = (float)(thisTime - lastTime)/1000;
+					lastTime = thisTime;
+
 					// check for input events
 					if(SDL_PollEvent(&event))
 					{
@@ -1013,7 +1023,6 @@ cout << "Added on Windows" << endl;
 							quit = true;
 							players1 = false;
 							break;
-
 						}
 
 						switch(event.type)
@@ -1068,12 +1077,6 @@ cout << "Added on Windows" << endl;
 					//Draw the title image
 					SDL_RenderCopy(renderer, title, NULL, &titlePos);
 
-					//Draw the Instructions Text image
-					//SDL_RenderCopy(renderer, InstText, NULL, &InstTextPos);
-
-					//Draw the cursor image
-					//SDL_RenderCopy(renderer, cursor, NULL, &cursorPos);
-
 					//Draw player image
 					player1.Draw(renderer);
 
@@ -1086,13 +1089,16 @@ cout << "Added on Windows" << endl;
 
 			case PLAYERS2:
 				players2 = true;
-				cout << "The Game State is 2 Player Game" << endl;
-				cout << "Press the A Button for Win Screen" << endl;
-				cout << "Press the B Button for Lose Screen" << endl;
-				cout << endl;
 
 				while(players2)
 				{
+
+
+					//set up frame rate for the section, or CASE
+					thisTime = SDL_GetTicks();
+					deltaTime = (float)(thisTime - lastTime)/1000;
+					lastTime = thisTime;
+
 					// check for input events
 					if(SDL_PollEvent(&event))
 					{
@@ -1109,20 +1115,33 @@ cout << "Added on Windows" << endl;
 						{
 						case SDL_CONTROLLERBUTTONDOWN:
 
-							if(event.cdevice.which == 0)
+							if(event.cdevice.which == 0 || event.cdevice.which == 1)
 							{
-								if(event.cbutton.button == SDL_CONTROLLER_BUTTON_A)
+								if(event.cbutton.button == SDL_CONTROLLER_BUTTON_X)
 								{
 									players2 = false;
 									gameState = WIN;
 								}
-								if(event.cbutton.button == SDL_CONTROLLER_BUTTON_B)
+								if(event.cbutton.button == SDL_CONTROLLER_BUTTON_Y)
 								{
 									players2 = false;
 									gameState = LOSE;
 								}
 							}
+							// send button press info to player 1
+							player1.OnControllerButton(event.cbutton);
+
+							// send button press info to player 2
+							player2.OnControllerButton(event.cbutton);
 							break;
+						case SDL_CONTROLLERAXISMOTION:
+							//send axis info to player 1
+							player1.OnControllerAxis(event.caxis);
+
+							//send axis info to player 2
+							player2.OnControllerAxis(event.caxis);
+							break;
+
 						}
 					}
 
@@ -1130,6 +1149,10 @@ cout << "Added on Windows" << endl;
 					//Update
 					UpdateBackground(deltaTime);
 
+					//Update players
+					player1.Update(deltaTime);
+
+					player2.Update(deltaTime);
 
 					// Start Drawing
 					//Clear SDL renderer
@@ -1147,11 +1170,10 @@ cout << "Added on Windows" << endl;
 					//Draw the title image
 					SDL_RenderCopy(renderer, title, NULL, &titlePos);
 
-					//Draw the Instructions Text image
-					//SDL_RenderCopy(renderer, InstText, NULL, &InstTextPos);
+					//Draw the players
+					player1.Draw(renderer);
 
-					//Draw the cursor image
-					SDL_RenderCopy(renderer, cursor, NULL, &cursorPos);
+					player2.Draw(renderer);
 
 
 					// SDL Render present
@@ -1165,6 +1187,13 @@ cout << "Added on Windows" << endl;
 
 				while(win)
 				{
+
+
+					//set up frame rate for the section, or CASE
+					thisTime = SDL_GetTicks();
+					deltaTime = (float)(thisTime - lastTime)/1000;
+					lastTime = thisTime;
+
 					// check for input events
 					if(SDL_PollEvent(&event))
 					{
@@ -1273,6 +1302,13 @@ cout << "Added on Windows" << endl;
 
 				while(lose)
 				{
+
+
+					//set up frame rate for the section, or CASE
+					thisTime = SDL_GetTicks();
+					deltaTime = (float)(thisTime - lastTime)/1000;
+					lastTime = thisTime;
+
 					// check for input events
 					if(SDL_PollEvent(&event))
 					{
