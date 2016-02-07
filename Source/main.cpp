@@ -26,6 +26,8 @@
 #include <unistd.h>
 #endif
 
+
+#include <string>
 #include <stdio.h>
 #include <iostream>
 using namespace std;
