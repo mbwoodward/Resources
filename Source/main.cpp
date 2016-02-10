@@ -728,7 +728,7 @@ cout << "Added on Windows" << endl;
 	SDL_GameController* gGameController1 = NULL;
 
 	//****** Open Game Controller - 2*****
-	gGameController1 = SDL_GameControllerOpen(0);
+	gGameController1 = SDL_GameControllerOpen(1);
 
 
 
