@@ -1,6 +1,6 @@
 #include "player.h"
 
-//Analog joystic dead zone
+//Analog joystick dead zone
 const int JOYSTICK_DEAD_ZONE = 8000;
 
 //Player creation method
