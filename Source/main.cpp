@@ -191,15 +191,14 @@ int main(int argc, char* argv[]) {
 
 //Output for Apple
 #if defined(__APPLE__)
-	cout << "Running on Apple" << endl;
 	//get the current working directory
 	string s_cwd(getcwd(NULL,0));
 
 	//create a string linking to the mac's images folder
 	string s_cwd_images = s_cwd + "/Resources/Images/";
 
-	//test
-	cout << s_cwd_images << endl;
+	//create a string to link to the audio folder on Mac
+	string audio_dir = s_cwd + "/Resources/Audio/";
 #endif
 
 //Output for Linux
@@ -210,10 +209,8 @@ int main(int argc, char* argv[]) {
 	//create a string linking to the linux's images folder
 	string s_cwd_images = s_cwd + "/Resources/Images/";
 
-	//test
-	cout << s_cwd_images << endl;
-cout << "Running on Linux" << endl;
-cout << "Added on Linux" << endl;
+	//create a string to link to the audio folder on Linux
+	string audio_dir = s_cwd + "/Resources/Audio/";
 #endif
 
 //Output for Windows
@@ -223,8 +220,10 @@ string s_cwd(getcwd(NULL, 0));
 
 //create a string linking to the Windows images folder
 string s_cwd_images = s_cwd + "\\Resources\\Images\\";
-cout << "Running on Windows" << endl;
-cout << "Added on Windows" << endl;
+
+//create a string to link to the audio folder on Windows
+string audio_dir = s_cwd + "\\Resources\\Audio\\";
+
 #endif
 
     SDL_Window *window;                    // Declare a pointer
@@ -253,11 +252,6 @@ cout << "Added on Windows" << endl;
 
     // create the renderer
     renderer = SDL_CreateRenderer(window,-1,SDL_RENDERER_ACCELERATED);
-
-
-    //create players
-    Player player1 = Player(renderer, 0, s_cwd_images.c_str(), 250.0, 500.0);
-    Player player2 = Player(renderer, 1, s_cwd_images.c_str(), 750.0, 500.0);
 
     //****** Create Background ******
     string BKGDpath = s_cwd_images + "Bacground.png";
@@ -747,7 +741,34 @@ cout << "Added on Windows" << endl;
 	//boolean values to control movement through the states****
 	bool menu, instructions, players1, players2, win, lose, quit = false;
 
+	//Open Audio Channel
+	Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
 
+	//Load a MUSIC file
+	Mix_Music *bgm = Mix_LoadMUS((audio_dir + "background.mp3").c_str());
+
+	if (bgm == NULL) {
+		// In the case that the window could not be made...
+		printf("Could not create music: %s\n", SDL_GetError());
+		return 1;
+	}
+
+	//if the MUSIC file is not playing - play it
+	if (!Mix_PlayingMusic())
+		Mix_PlayMusic(bgm, -1);
+
+	//Set up a Sound Effect CHUNK for the button over state
+	Mix_Chunk *overSound = Mix_LoadWAV((audio_dir + "over.wav").c_str());
+
+	//Set up a Sound Effect CHUNK for the button pressed state
+	Mix_Chunk *pressedSound = Mix_LoadWAV((audio_dir + "pressed.wav").c_str());
+
+	//bool value to control the over sound effect and the buttons
+	bool alreadyOver = false;
+
+	//create players
+	Player player1 = Player(renderer, 0, s_cwd_images.c_str(), audio_dir.c_str(), 250.0, 500.0);
+	Player player2 = Player(renderer, 1, s_cwd_images.c_str(), audio_dir.c_str(), 750.0, 500.0);
 
     // The window is open: could enter program loop here (see SDL_PollEvent())
 	while(!quit)
@@ -755,6 +776,8 @@ cout << "Added on Windows" << endl;
 		switch(gameState)
 		{
 			case MENU:
+
+				alreadyOver = false;
 				menu = true;
 
 				while(menu)
@@ -792,6 +815,8 @@ cout << "Added on Windows" << endl;
 									//if player chooses 1 player game
 									if(players1Over)
 									{
+										//Play the Over sound - plays fine through levels, must pause/delay for QUIT 
+										Mix_PlayChannel(-1, pressedSound, 0);
 										menu = false;
 										gameState = PLAYERS1;
 										players1Over = false;
@@ -799,6 +824,8 @@ cout << "Added on Windows" << endl;
 									//if player chooses 2 player game
 									if(players2Over)
 									{
+										//Play the Over sound - plays fine through levels, must pause/delay for QUIT 
+										Mix_PlayChannel(-1, pressedSound, 0);
 										menu = false;
 										gameState = PLAYERS2;
 										players2Over = false;
@@ -806,6 +833,8 @@ cout << "Added on Windows" << endl;
 									//if player chooses instructions
 									if(instructionsOver)
 									{
+										//Play the Over sound - plays fine through levels, must pause/delay for QUIT 
+										Mix_PlayChannel(-1, pressedSound, 0);
 										menu = false;
 										gameState = INSTRUCTIONS;
 										instructionsOver = false;
@@ -813,6 +842,10 @@ cout << "Added on Windows" << endl;
 									//if player chooses quit
 									if(quitOver)
 									{
+										//Play the Over sound - plays fine through levels, must pause/delay for QUIT 
+										Mix_PlayChannel(-1, pressedSound, 0);
+										//Add a slight delay
+										SDL_Delay(200); 
 										menu = false;
 										quit = true;
 										quitOver = false;
@@ -839,6 +872,22 @@ cout << "Added on Windows" << endl;
 					players2Over = SDL_HasIntersection(&activePos, &players2NPos);
 					instructionsOver = SDL_HasIntersection(&activePos, &InstructionsNPos);
 					quitOver = SDL_HasIntersection(&activePos, &QuitNPos);
+
+					//If the cursor is over a button, play the over sound
+					if (players1Over || players2Over || instructionsOver || quitOver) 
+					{
+						if (alreadyOver == false) 
+						{
+							Mix_PlayChannel(-1, overSound, 0);
+							alreadyOver = true;
+						}
+					}
+
+					//if the cursor is not over ANY button, reset the already Over var
+					if (!players1Over && !players2Over && !instructionsOver && !quitOver)
+					{
+						alreadyOver = false;
+					}
 
 					// Start Drawing
 					//Clear SDL renderer
@@ -906,6 +955,9 @@ cout << "Added on Windows" << endl;
 				break;	// end menu case
 
 			case INSTRUCTIONS:
+
+				alreadyOver = false;
+
 				instructions = true;
 
 				while(instructions)
@@ -940,6 +992,8 @@ cout << "Added on Windows" << endl;
 								//if player chooses menu
 								if(menuOver)
 								{
+								//Play the Over sound - plays fine through levels, must pause/delay for QUIT 
+								Mix_PlayChannel(-1, pressedSound, 0);
 								instructions = false;
 								gameState = MENU;
 								menuOver = false;
@@ -960,6 +1014,23 @@ cout << "Added on Windows" << endl;
 
 					//check for cursor intersection with menu button
 					menuOver = SDL_HasIntersection(&activePos, &MenuPos);
+
+
+					//If the cursor is over a button, play the over sound
+					if (menuOver)
+					{
+						if (alreadyOver == false)
+						{
+							Mix_PlayChannel(-1, overSound, 0);
+							alreadyOver = true;
+						}
+					}
+
+					//if the cursor is not over ANY button, reset the already Over var
+					if (!menuOver)
+					{
+						alreadyOver = false;
+					}
 
 
 					// Start Drawing
@@ -1004,11 +1075,8 @@ cout << "Added on Windows" << endl;
 
 
 			case PLAYERS1:
+
 				players1 = true;
-				cout << "The Game State is 1 Player Game" << endl;
-				cout << "Press the A Button for Win Screen" << endl;
-				cout << "Press the B Button for Lose Screen" << endl;
-				cout << endl;
 
 				while(players1)
 				{
@@ -1093,6 +1161,7 @@ cout << "Added on Windows" << endl;
 				break;	// end players1 case
 
 			case PLAYERS2:
+
 				players2 = true;
 
 				while(players2)
@@ -1188,6 +1257,9 @@ cout << "Added on Windows" << endl;
 				break;	// end players2 case
 
 			case WIN:
+
+				alreadyOver = false;
+
 				win = true;
 
 				while(win)
@@ -1220,12 +1292,16 @@ cout << "Added on Windows" << endl;
 								//if player chooses menu
 								if(menuOver)
 								{
-								win = false;
-								gameState = MENU;
-								menuOver = false;
+									//Play the Over sound - plays fine through levels, must pause/delay for QUIT 
+									Mix_PlayChannel(-1, pressedSound, 0);
+									win = false;
+									gameState = MENU;
+									menuOver = false;
 								}
-								if(playOver)
+								if (playOver)
 								{
+									//Play the Over sound - plays fine through levels, must pause/delay for QUIT 
+									Mix_PlayChannel(-1, pressedSound, 0);
 									win = false;
 									gameState = PLAYERS1;
 									playOver = false;
@@ -1257,7 +1333,21 @@ cout << "Added on Windows" << endl;
 					//Clear SDL renderer
 					SDL_RenderClear(renderer);
 
+					//If the cursor is over a button, play the over sound
+					if (menuOver || playOver)
+					{
+						if (alreadyOver == false)
+						{
+							Mix_PlayChannel(-1, overSound, 0);
+							alreadyOver = true;
+						}
+					}
 
+					//if the cursor is not over ANY button, reset the already Over var
+					if (!menuOver && !playOver)
+					{
+						alreadyOver = false;
+					}
 
 
 					//Draw the bkgd1 image
@@ -1303,6 +1393,9 @@ cout << "Added on Windows" << endl;
 
 
 			case LOSE:
+
+				alreadyOver = false;
+
 				lose = true;
 
 				while(lose)
@@ -1335,12 +1428,16 @@ cout << "Added on Windows" << endl;
 								//if player chooses menu
 								if(menuOver)
 								{
-								lose = false;
-								gameState = MENU;
-								menuOver = false;
+									//Play the Over sound - plays fine through levels, must pause/delay for QUIT 
+									Mix_PlayChannel(-1, pressedSound, 0);
+									lose = false;
+									gameState = MENU;
+									menuOver = false;
 								}
 								if(playOver)
 								{
+									//Play the Over sound - plays fine through levels, must pause/delay for QUIT 
+									Mix_PlayChannel(-1, pressedSound, 0);
 									lose = false;
 									gameState = PLAYERS1;
 									playOver = false;
@@ -1365,6 +1462,22 @@ cout << "Added on Windows" << endl;
 
 					//check for cursor intersection with Play button
 					playOver = SDL_HasIntersection(&activePos, &PlayPos);
+
+					//If the cursor is over a button, play the over sound
+					if (menuOver || playOver)
+					{
+						if (alreadyOver == false)
+						{
+							Mix_PlayChannel(-1, overSound, 0);
+							alreadyOver = true;
+						}
+					}
+
+					//if the cursor is not over ANY button, reset the already Over var
+					if (!menuOver && !playOver)
+					{
+						alreadyOver = false;
+					}
 
 
 					// Start Drawing

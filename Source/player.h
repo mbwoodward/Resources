@@ -2,16 +2,19 @@
 #if defined(__APPLE__)
 #include "SDL2/SDL.h"
 #include "SDL2_image/SDL_image.h"
+#include "SDL2_mixer/SDL_mixer.h"
 #endif
 
 #if defined(__linux__)
 #include "SDL2/SDL.h"
-#include "SDL2_image/SDL_image.h"
+#include "SDL2/SDL_image.h"
+#include "SDL2/SDL_mixer.h"
 #endif
 
 #if defined(_WIN32) || (_WIN64)
 #include "SDL.h"
 #include "SDL_image.h"
+#include "SDL_mixer.h"
 #endif
 
 //needed includes
@@ -58,7 +61,7 @@ public:
 
 	//Player's creation method using passed in values for renderer, player number, path to the texture
 	//starting position X, starting position Y
-	Player(SDL_Renderer *renderer, int pNum, string filePath, float x, float y);
+	Player(SDL_Renderer *renderer, int pNum, string filePath, string audioPath,  float x, float y);
 
 	//update the player using the passed in deltaTime
 	void Update(float deltaTime);
