@@ -3,26 +3,30 @@
 #include "SDL2/SDL.h"
 #include "SDL2_image/SDL_image.h"
 #include "SDL2_mixer/SDL_mixer.h"
+#include "SDL2_ttf/SDL_ttf.h"
 #endif
 
 #if defined(__linux__)
 #include "SDL2/SDL.h"
 #include "SDL2/SDL_image.h"
 #include "SDL2/SDL_mixer.h"
+#include "SDL2/SDL_ttf.h"
 #endif
 
 #if defined(_WIN32) || (_WIN64)
 #include "SDL.h"
 #include "SDL_image.h"
 #include "SDL_mixer.h"
+#include "SDL_ttf.h"
 #endif
 
 //needed includes
 #include <string>
 #include <stdio.h>
 #include <iostream>
+#include <sstream>
 using namespace std;
-
+ 
 // Bullet includes
 #include <vector>
 #include "bullet.h"
@@ -31,6 +35,34 @@ class Player
 {
 public:
 
+	//is the player active- still alive?
+	bool active;
+
+	//player score and lives vars
+	int playerScore, oldScore, playerLives, oldLives;
+
+	//Variable for what font to use
+	TTF_Font *font;
+
+	//Font color var
+	SDL_Color colorP1 = { 0, 255, 0, 255 };
+	SDL_Color colorP2 = { 0, 0, 255, 255 };
+
+	//Surface for thge player score and player lives
+	SDL_Surface *scoreSurface, *livesSurface;
+
+	//Textures for the player score and player lives
+	SDL_Texture *scoreTexture, *livesTexture;
+
+	//SDL_Rects for the player score and lives textures
+	SDL_Rect scorePos, livesPos;
+
+	//strings to hold the temp values of player lives and player score
+	string tempScore, tempLives;
+
+	//audio sound effect - CHUNK
+	Mix_Chunk *laser;
+	
 	//variable to hold the list of bullets
 	vector<Bullet> bulletList;
 
@@ -64,7 +96,7 @@ public:
 	Player(SDL_Renderer *renderer, int pNum, string filePath, string audioPath,  float x, float y);
 
 	//update the player using the passed in deltaTime
-	void Update(float deltaTime);
+	void Update(float deltaTime, SDL_Renderer *renderer);
 
 	//draw the player main's passed in renderer
 	void Draw(SDL_Renderer *renderer);
@@ -77,6 +109,15 @@ public:
 
 	// Player's destruction method
 	~Player();
+
+	//update Score method
+	void UpdateScore(SDL_Renderer *renderer);
+
+	//update Lives method
+	void UpdateLives(SDL_Renderer *renderer);
+
+	//Reset method for player
+	void Reset();
 
 private:
 
